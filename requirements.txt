@@ -1,0 +1,2 @@
+pwntools
+pwndbg @ git+https://github.com/pwndbg/pwndbg.git@dev
