@@ -25,113 +25,114 @@ def is_bit_set(val, bit):
 
 
 def read_bytes(addr, count):
-    i = gdb.inferiors()[0]
-    m = i.read_memory(addr, count)
-    return m.tobytes()
-
+    return bytes(pwndbg.gdblib.memory.read(addr, count))
 
 def write_bytes(addr, data, c=None):
-    if c is None:
-        c = len(data)
-    i = gdb.inferiors()[0]
-    m = i.write_memory(addr, data, c)
-    print(m)
+    pwndbg.gdblib.memory.write(addr, data)
 
 
 def read_byte(addr):
     return read_bytes(addr, 1)[0]
 
+read_u8 = read_byte
 
 def write_byte(addr, b):
-    write_bytes(addr, bytes([b]), 1)
+    write_bytes(addr, bytes([b]))
 
+write_u8 = write_byte
 
-def read_ulong(addr):
+def read_u64(addr):
     m = read_bytes(addr, 8)
     return struct.unpack("<Q", m)[0]
 
+def write_u64(addr, l):
+    write_bytes(addr, struct.pack("<Q", l))
 
-def write_ulong(addr, l):
-    write_bytes(addr, struct.pack("<Q", l), 8)
-
-
-def read_ushort(addr):
+def read_u16(addr):
     m = read_bytes(addr, 2)
     return struct.unpack("<H", m)[0]
 
+def write_u16(addr, u):
+    write_bytes(addr, struct.pack("<H", u))
 
-def write_ushort(addr, u):
-    write_bytes(addr, struct.pack("<H", u), 2)
-
-
-def read_uint(addr):
+def read_u32(addr):
     m = read_bytes(addr, 4)
     return struct.unpack("<I", m)[0]
 
+def write_u32(addr, u):
+    write_bytes(addr, struct.pack("<I", u))
 
-def write_uint(addr, u):
-    write_bytes(addr, struct.pack("<I", u), 4)
-
-
-def read_slong(addr):
+def read_s64(addr):
     m = read_bytes(addr, 8)
     return struct.unpack("<q", m)[0]
 
+def write_s64(addr, l):
+    write_bytes(addr, struct.pack("<q", l))
 
-def write_slong(addr, l):
-    write_bytes(addr, struct.pack("<q", l), 8)
+def read_double(addr):
+    m = read_bytes(addr, 8)
+    return struct.unpack("<d", m)[0]
 
+def write_double(addr, v):
+    write_bytes(addr, struct.pack("<d", v))
 
-def read_sint(addr):
-    i = gdb.inferiors()[0]
-    m = i.read_memory(addr, 4)
+def write_float(addr, v):
+    write_bytes(addr, struct.pack("<f", v))
+
+def read_float(addr):
+    m = read_bytes(addr, 4)
+    return struct.unpack("<f", m)[0]
+
+def read_s32(addr):
+    m = read_bytes(addr, 4)
     return struct.unpack("<i", m)[0]
 
+def write_s32(addr, i):
+    write_bytes(addr, struct.pack("<i", i))
 
-def write_sint(addr, i):
-    write_bytes(addr, struct.pack("<i", i), 4)
-
-
-def read_pointer(addr):
-    return read_ulong(addr)
-
+def read_pointer(addr, deref_count=0):
+    if deref_count >= 1:
+        return read_pointer(read_pointer(addr), deref_count=deref_count-1)
+    else:
+        return read_u64(addr)
 
 def write_pointer(addr, ptr):
-    return write_ulong(addr, ptr)
+    return write_u64(addr, ptr)
 
+def read_bool(addr):
+    v = read_u32(addr)
+    return True if v != 0 else False
 
-def read_string(addr):
-    s = b""
-    b = read_byte(addr)
-    i = 1
-    s += bytes([b])
-    while b != 0x0:
-        b = read_byte(addr + i)
-        s += bytes([b])
-        i += 1
-    return s
+def write_bool(addr, v):
+    write_u32(addr, 1 if v else 0)
 
+def read_string(addr, length: Optional[int]=None):
+     s = b""
+     b = read_byte(addr)
+     i = 1
+     s += bytes([b])
+     while b != 0x0 and (length is None or i < length):
+         b = read_byte(addr + i)
+         s += bytes([b])
+         i += 1
+     return s
 
 def write_string(addr, s, length=None, append_zero=False):
-    assert len(s) >= 2
     if append_zero and s[-1] != 0:
         s += bytes([0])
 
-    if length is None:
-        length = len(s)
-
-    write_bytes(addr, s, length)
+    write_bytes(addr, s)
 
 
 # EXPERIMENTAL: Might not work for different lib versions
 def get_std_vec_elements(addr, element_size):
-    start = read_ulong(addr)
-    end = read_ulong(addr+8)
+    start = read_u64(addr)
+    end = read_u64(addr+8)
     return read_array(start, (end-start) // element_size, element_size)
 
 
 def read_array(addr, count, element_size):
-    element_readers = {1: read_byte, 2: read_ushort, 4: read_uint, 8: read_ulong}
+    element_readers = {1: read_byte, 2: read_u16, 4: read_u32, 8: read_u64}
     if element_size not in [1, 2, 4, 8]:
         raise ValueError("element_size has to be in [1, 2, 4, 8]")
 
@@ -154,7 +155,7 @@ def read_uint_array(addr, count):
     return read_array(addr, count, 4)
 
 
-def read_ulong_array(addr, count):
+def read_u64_array(addr, count):
     return read_array(addr, count, 8)
 
 
@@ -338,7 +339,7 @@ def read_string_from_reg_ptr(reg_name):
 def write_string_to_reg_ptr(reg_name, s):
     str_ptr = read_reg(reg_name)
     write_string(str_ptr, s, len(s))
-    return str_ptr, s 
+    return str_ptr, s
 
 
 def set_manual_breakpoint(addr):
@@ -348,17 +349,16 @@ def set_manual_breakpoint(addr):
 def set_manual_watchpoint(addr):
     gdb.execute(f"watch *{hex(addr)}")
 
-
 def delete_all_breakpoints():
     gdb.execute("del")
 
+del_bps = delete_all_breakpoints
 
 def gdb_run(args=None):
     if args is not None:
         gdb.execute(f"r {' '.join(args)}")
     else:
         gdb.execute("r")
-
 
 def patch_string_gdb(addr, string):
     cmd = f"set "+" {char["+str(len(string)+1)+"]}"+ f'{hex(addr)} = "{string}"'
@@ -376,7 +376,7 @@ def sim_call(ret_address):
 
 def read_stack(off=0):
     rsp_val = registers.rsp
-    return read_ulong(rsp_val + off * 8)
+    return read_u64(rsp_val + off * 8)
 
 
 def set_reg(reg_name, val):
@@ -387,6 +387,8 @@ def set_reg(reg_name, val):
 def get_function_symbol_addr(sym_name):
     return pwndbg.gdblib.symbol.address(sym_name)
 
+def ptr_to_symbol(ptr):
+    return pwndbg.gdblib.symbol.get(ptr)
 
 def get_malloc_addr():
     return get_function_symbol_addr("__libc_malloc")
@@ -445,6 +447,10 @@ class RegisterDescriptor:
         return ""
 
 
+def get_eflags_info():
+    return EFLAGSRegisterDescriptor("eflags").info()
+
+
 class EFLAGSRegisterDescriptor(RegisterDescriptor):
     def __init__(self, reg_name: str):
         super().__init__(reg_name)
@@ -470,9 +476,9 @@ class EFLAGSRegisterDescriptor(RegisterDescriptor):
         RF = self._check_flag_bit(16)
         VM = self._check_flag_bit(17)
         AC = self._check_flag_bit(18)
-        VIF = self._check_flag_bit(19)     
-        VIP = self._check_flag_bit(20)     
-        ID = self._check_flag_bit(21)     
+        VIF = self._check_flag_bit(19)
+        VIP = self._check_flag_bit(20)
+        ID = self._check_flag_bit(21)
 
         if CF:
             infol.append('CF')
@@ -506,7 +512,7 @@ class EFLAGSRegisterDescriptor(RegisterDescriptor):
         if VIP:
             infol.append('VIP')
         if ID:
-            infol.append('ID')    
+            infol.append('ID')
 
         return "[" + " ".join(infol) + "]"
 
@@ -528,14 +534,14 @@ class Registers:
     dx: RegisterDescriptor
     edx: RegisterDescriptor
     rdx: RegisterDescriptor
-    
+
     esi: RegisterDescriptor
     rsi: RegisterDescriptor
     edi: RegisterDescriptor
     rdi: RegisterDescriptor
     rbp: RegisterDescriptor
     ebp: RegisterDescriptor
-    
+
     esp: RegisterDescriptor
     rsp: RegisterDescriptor
     r8: RegisterDescriptor
@@ -646,7 +652,7 @@ def wrap_get_got_addr(symbol_name):
                 continue
         return int(address, 16)
     return -1
-        
+
 def wrap_get_plt_addr(symbol_name):
     raise NotImplementedError("parsing .plt(.sec) seems to be to hard for tools???? to lazy to implement the parsing myself now")
 
@@ -670,20 +676,28 @@ def resolve_symbol_address(symbol_name, libc_path=None):
             return -1
 
 
-def get_heap_base() -> Optional[list[int]]:
+def vmmap():
+    return pwndbg.gdblib.vmmap.get()
+
+def get_executable_pages():
+    return [p for p in vmmap() if p.execute]
+
+def get_heap_base():
     if pwndbg.heap.current is not None:
         heap_ptrs = []
         for arena in pwndbg.heap.current.arenas:
             for heap in arena.heaps:
-                heap_ptrs.append(heap.addr)
+                heap_ptrs.append(heap.start)
         if len(heap_ptrs) == 1:
             return heap_ptrs[:1]
         else:
             return heap_ptrs
     else:
-        for page in pwndbg.gdblib.vmmap.get():
+        for page in vmmap():
             if "heap" in page.objfile:
                 return [page.start]
+    return [-1]
+
 
 def get_first_heap_end_address():
     return pwndbg.gdblib.vmmap.find(get_first_heap_address()).end
@@ -700,6 +714,9 @@ def si():
 
 def gdb_continue():
     gdb.execute("c")
+
+c = gdb_continue
+r = gdb_run
 
 def set_library_path(path):
     gdb.execute(f"set env LD_LIBRARY_PATH {path}")
@@ -808,6 +825,33 @@ def get_system_libc_path():
         return results[0]
     else:
         return ""
+
+
+def get_vm_log_breakpoint_template(addresses, handler_ids = None, pie=True, print_handlers=False):
+    if handler_ids is None:
+        handler_ids = []
+    else:
+        assert len(handler_ids) == len(addresses)
+
+    def get_func_name(i):
+        func_id = handler_ids[i] if len(handler_ids) != 0 else i
+        return f"vm_handler_{func_id}"
+
+    for i, addr in enumerate(addresses):
+        func_id = handler_ids[i] if len(handler_ids) != 0 else i
+        func_name_template = f'def {get_func_name(i)}\n    return "OP{func_id}"\n'
+        print(func_name_template)
+
+    print()
+
+    for i, addr in enumerate(addresses):
+        if pie:
+            bp_template = "LogBreakpoint.create_pie_bp"
+        else:
+            bp_template = "LogBreakpoint.create_pt_bp"
+
+        print(f"{bp_template}({hex(addr)}, {get_func_name(i)})")
+
 
 
 gdb.events.exited.connect(exit_handler)

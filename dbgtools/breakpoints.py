@@ -8,6 +8,10 @@ def get_all_breakpoints() -> Sequence[gdb.Breakpoint]:
     return gdb.breakpoints()
 
 
+def get_breakpoints_with_location(location):
+    return list(filter(lambda b: b.location == location, get_all_breakpoints()))
+
+
 def convert_to_gdb_bp_str(ptr: Optional[int] = None,
                           func_name: Optional[str] = None,
                           offset: Optional[int] = None) -> str:
@@ -29,7 +33,7 @@ class CustomBreakpoint(gdb.Breakpoint):
     def __init__(self,
                  bp_str: str,
                  action_funcs: Optional[list[Callable[[], None]]] = None,
-                 enabled: bool = True,
+                 enabled_default: bool = True,
                  explicit_stop: bool = False,
                  temporary: bool = False):
         super().__init__(bp_str, temporary=temporary)
@@ -37,7 +41,7 @@ class CustomBreakpoint(gdb.Breakpoint):
             action_funcs = []
         self._make_unique()
         self._bp_str = bp_str
-        self.enabled = enabled
+        self.enabled = enabled_default
         self._explicit_stop = explicit_stop
         self._action_funcs = action_funcs
         self._cond_func = None
@@ -57,7 +61,7 @@ class CustomBreakpoint(gdb.Breakpoint):
                    *args, **kwargs)
 
     def _make_unique(self):
-        for bp in get_all_breakpoints():
+        for bp in get_breakpoints_with_location(self.location):
             if bp.number != self.number:
                 bp.delete()
 
@@ -112,3 +116,30 @@ class ActionBreakpoint(CustomBreakpoint):
                          enabled_default=True,
                          explicit_stop=explicit_stop,
                          temporary=False)
+
+
+# TODO: cleanup
+class TraceBreakpoint(CustomBreakpoint):
+    def __init__(self, bp_str: str, trace_function, explicit_stop=False):
+        super().__init__(bp_str, [self._do_trace], enabled_default=True, explicit_stop=explicit_stop, temporary=False)
+        self._trace_func = trace_function
+        self._last_traces = []
+        self._traces = []
+
+    def get_traces(self):
+        return self._traces
+
+    def get_last_traces(self):
+        return self._last_traces
+
+    def reset_last_traces(self):
+        self._last_traces = []
+
+    def _do_trace(self):
+        trace = self._trace_func()
+        self._last_traces.append(trace)
+        self._traces.append(trace)
+
+    def reset(self):
+        self._traces = []
+        self._last_traces = []

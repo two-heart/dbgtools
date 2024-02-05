@@ -2,5 +2,15 @@
 # do not reexecute this as different versions might
 # change offsets
 
-all:
+
+all: basic types asan
+
+basic:
 	gcc -o ../bin/basic basic.c
+
+types:
+	gcc -o ../bin/types types.c
+
+asan:
+	clang -o ../bin/asan -fsanitize=address asan.c
+

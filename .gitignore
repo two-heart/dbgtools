@@ -5,5 +5,6 @@ pwntools-doc/
 pyvenv.cfg
 examples/gdb_script.log
 examples/trace_example.py
-examples/.gdb_history
+**/.gdb_history
 .gdb_history
+**/__pycache__
