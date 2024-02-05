@@ -22,9 +22,6 @@ MAP_ANON = 0x20
 MAP_PRIVATE = 0x2
 
 
-def is_bit_set(val, bit):
-    return val & (1 << bit) != 0
-
 def set_manual_breakpoint(addr):
     gdb.execute(f"b *{hex(addr)}")
 
