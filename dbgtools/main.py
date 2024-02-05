@@ -22,6 +22,15 @@ MAP_ANON = 0x20
 MAP_PRIVATE = 0x2
 
 
+def is_program_running():
+    # very hacky
+    try:
+        gdb.execute("x $ax", to_string=True)
+        return True
+    except gdb.error:
+        return False
+
+
 def set_manual_breakpoint(addr):
     gdb.execute(f"b *{hex(addr)}")
 
