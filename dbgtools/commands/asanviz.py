@@ -1,21 +1,14 @@
 import gdb
+import argparse
+import pwndbg
+import pwndbg.commands
 from dbgtools.asan import asan_visualize_region
-from dbgtools.commands.utils import parse_tint
 
 
-class ASANVisualizeCmd(gdb.Command):
-  """Visualize asan redzones"""
-  def __init__(self):
-    super(ASANVisualizeCmd, self).__init__("asanviz", gdb.COMMAND_USER)
+parser = argparse.ArgumentParser(description="Visualize asan redzones")
+parser.add_argument("ptr", type=int, help="ptr to check surronding region")
 
-  def help(self):
-    print("asanviz <ptr>")
-
-  def invoke(self, args, from_tty):
-    args = args.split()
-    if len(args) != 1:
-      self.help()
-      return
-    else:
-      ptr = parse_tint(args[0])
-      asan_visualize_region(ptr)
+@pwndbg.gdblib.proc.OnlyWhenRunning
+@pwndbg.commands.ArgparsedCommand(parser)
+def asanviz(ptr: int):
+    asan_visualize_region(ptr)

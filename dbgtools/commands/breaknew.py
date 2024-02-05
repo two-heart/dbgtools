@@ -1,20 +1,15 @@
 import gdb
+import pwndbg
+import argparse
+import pwndbg.commands
 from dbgtools.main import delete_all_breakpoints
 from dbgtools.gdbapi import execute_commands
 
 
-class BreakNewCmd(gdb.Command):
-    """Creates a breakpoint and delete all previous ones"""
-    def __init__(self):
-        super(BreakNewCmd, self).__init__("bn", gdb.COMMAND_USER)
+parser = argparse.ArgumentParser(description="Creates a breakpoint and delete all previous ones")
+parser.add_argument("bp", type=str, help="breakpoint string")
 
-    def help(self):
-        print("Usage: bn <bp>")
-
-    def invoke(self, argument, from_tty):
-        argument = argument.split()
-        if len(argument) != 1:
-            self.help()
-        else:
-            delete_all_breakpoints()
-            execute_commands([f"b {argument[0]}"])
+@pwndbg.commands.ArgparsedCommand(parser)
+def bnew(bp: str):
+    delete_all_breakpoints()
+    execute_commands([f"b {bp}"])

@@ -1,22 +1,22 @@
 import gdb
+import pwndbg
+import argparse
+import pwndbg.commands
 from dbgtools.memory import read_bytes
+from dbgtools.main import get_executable_pages
 import pwn
 
 
-class GadgetSearchCmd(gdb.Command):
-    """In memory search for (ROP) gadgets"""
-    def __init__(self):
-        super(GadgetSearchCmd, self).__init__("gadgetsearch", gdb.COMMAND_USER)
+parser = argparse.ArgumentParser(description="In memory search for (ROP) gadgets")
+parser.add_argument("gadget", type=int, help="Gadget string")
 
-    def help(self):
-        print("gadgetsearch <gadget_str>")
-
-    def invoke(self, args, from_tty):
-        argstr = args.strip('"').strip()
-        b = pwn.asm(argstr)
-        print(f"Searching for {str(b).lstrip('b')}")
-        for page in sorted(get_executable_pages(), key=lambda p: p.start):
-            for ptr in range(page.start, page.end + 1):
-                if read_bytes(ptr, len(b)) == b:
-                    offset = ptr - page.start
-                    print(f"{argstr} @ {page.objfile}+{hex(offset)} ({hex(ptr)})")
+@pwndbg.gdblib.proc.OnlyWhenRunning
+@pwndbg.commands.ArgparsedCommand(parser)
+def gadgetsearch(gadget: str):
+    b = pwn.asm(gadget)
+    print(f"Searching for {str(b).lstrip('b')}")
+    for page in sorted(get_executable_pages(), key=lambda p: p.start):
+        for ptr in range(page.start, page.end + 1):
+            if read_bytes(ptr, len(b)) == b:
+                offset = ptr - page.start
+                print(f"{gadget} @ {page.objfile}+{hex(offset)} ({hex(ptr)})")
