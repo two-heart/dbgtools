@@ -1,5 +1,5 @@
 import gdb
-from dbgtools.main import *
+from dbgtools.memory import read_bytes
 import pwn
 
 

@@ -1,6 +1,7 @@
 import gdb
 from dbgtools.breakpoints import LogBreakpoint
-from dbgtools.main import get_malloc_addr, get_free_addr, read_stack, registers
+from dbgtools.main import get_malloc_addr, get_free_addr, registers
+from dbgtools.memory import read_stack
 from dbgtools.logger import Logger
 
 class TraceHeapCmd(gdb.Command):

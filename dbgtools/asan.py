@@ -1,4 +1,4 @@
-from dbgtools.main import read_byte, read_u64
+from dbgtools.memory import read_byte, read_u64
 
 
 NORMAL = "\x1b[0m"
