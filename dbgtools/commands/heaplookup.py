@@ -1,5 +1,6 @@
 import gdb
-from dbgtools.main import get_first_heap_address, get_first_heap_end_address, read_pointer, get_libc_base, get_binary_base
+from dbgtools.main import get_first_heap_address, get_first_heap_end_address, get_libc_base, get_binary_base
+from dbgtools.memory import read_pointer
 import pwndbg
 from dbgtools.commands.utils import parse_tint
 
@@ -13,7 +14,7 @@ class HeapPtrLookup(gdb.Command):
     def help(self):
         print("Usage: heaplookup <start address> <end address>")
 
-    def invoke(self, argument, from_tty):     
+    def invoke(self, argument, from_tty):
         argument = argument.split()
         heap_start_addr = get_first_heap_address()
         heap_end_addr = get_first_heap_end_address()

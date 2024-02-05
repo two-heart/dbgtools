@@ -1,7 +1,8 @@
 import gdb
 from dbgtools import set_manual_breakpoint, set_manual_watchpoint, \
-                     is_program_running, gdb_continue, gdb_run, registers, \
+                     is_program_running, gdb_continue, gdb_run, \
                      delete_all_breakpoints, si
+from dbgtools.regs import *
 import time
 from dbgtools.logger import Logger
 from dbgtools.commands.utils import parse_tint
@@ -33,7 +34,7 @@ class Tracer:
             set_manual_breakpoint(self._start_bp_addr)
         elif self._start_wp_addr is not None:
             set_manual_watchpoint(self._start_wp_addr)
-        
+
         self._start_time = time.time()
         if self._force_rerun:
             gdb_run(self._start_args)
