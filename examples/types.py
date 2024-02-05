@@ -1,5 +1,6 @@
 import dbgtools
 from dbgtools.types import *
+from dbgtools.regs import *
 
 
 class A(Struct):

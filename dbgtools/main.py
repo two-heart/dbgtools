@@ -11,6 +11,7 @@ from subprocess import check_output
 from dbgtools.logger import Logger
 from dbgtools.gdbapi import execute_commands
 from dbgtools.regs import *
+from dbgtools.memory import write_pointer
 
 
 
@@ -44,10 +45,6 @@ def gdb_run(args=None):
 def patch_string_gdb(addr, string):
     cmd = f"set "+" {char["+str(len(string)+1)+"]}"+ f'{hex(addr)} = "{string}"'
     gdb.execute(cmd)
-
-
-def set_rip(new_rip):
-    registers.rip = new_rip
 
 
 def sim_call(ret_address):
@@ -232,7 +229,7 @@ def call_function(func_ptr, rdi=None, rsi=None, rdx=None, rcx=None, r8=None, r9=
         registers.r9 = r9
     rsp_val = registers.rsp
     rip_val = registers.rip
-    set_rip(func_ptr)
+    registers.rip = func_ptr
     registers.rsp = rsp_val - 0x100
     sim_call(rip_val)
     finish_func()
