@@ -6,3 +6,5 @@ from dbgtools.commands import *
 from dbgtools import v8
 from dbgtools import asan
 from dbgtools import types
+from dbgtools import memory
+from dbgtools import regs

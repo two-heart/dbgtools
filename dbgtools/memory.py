@@ -1,6 +1,8 @@
 import pwndbg
 import struct
 from typing import Optional
+from dbgtools.regs import registers
+
 
 def read_bytes(addr, count):
     return bytes(pwndbg.gdblib.memory.read(addr, count))

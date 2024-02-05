@@ -1,8 +1,10 @@
 import gdb
 from dbgtools.breakpoints import LogBreakpoint
-from dbgtools.main import get_malloc_addr, get_free_addr, registers
+from dbgtools.main import get_malloc_addr, get_free_addr
+from dbgtools.regs import *
 from dbgtools.memory import read_stack
 from dbgtools.logger import Logger
+
 
 class TraceHeapCmd(gdb.Command):
     """Traces malloc() and free() calls"""
