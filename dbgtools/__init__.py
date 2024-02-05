@@ -8,3 +8,4 @@ from dbgtools import asan
 from dbgtools import types
 from dbgtools import memory
 from dbgtools import regs
+from dbgtools import utils

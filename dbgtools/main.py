@@ -25,7 +25,6 @@ MAP_PRIVATE = 0x2
 def set_manual_breakpoint(addr):
     gdb.execute(f"b *{hex(addr)}")
 
-
 def set_manual_watchpoint(addr):
     gdb.execute(f"watch *{hex(addr)}")
 
@@ -33,6 +32,7 @@ def delete_all_breakpoints():
     gdb.execute("del")
 
 del_bps = delete_all_breakpoints
+
 
 def gdb_run(args=None):
     if args is not None:
@@ -70,16 +70,6 @@ def get_mmap_addr():
 
 def get_mprotect_addr():
     return get_function_symbol_addr("mprotect")
-
-
-def is_program_running():
-    # very hacky
-    try:
-        gdb.execute("x $ax", to_string=True)
-        return True
-    except gdb.error:
-        return False
-
 
 def wrap_readelf_s(libc_path, sym_name):
     data = check_output(f"readelf -s {libc_path}", shell=True).splitlines()
@@ -315,33 +305,6 @@ def get_system_libc_path():
         return results[0]
     else:
         return ""
-
-
-def get_vm_log_breakpoint_template(addresses, handler_ids = None, pie=True, print_handlers=False):
-    if handler_ids is None:
-        handler_ids = []
-    else:
-        assert len(handler_ids) == len(addresses)
-
-    def get_func_name(i):
-        func_id = handler_ids[i] if len(handler_ids) != 0 else i
-        return f"vm_handler_{func_id}"
-
-    for i, addr in enumerate(addresses):
-        func_id = handler_ids[i] if len(handler_ids) != 0 else i
-        func_name_template = f'def {get_func_name(i)}\n    return "OP{func_id}"\n'
-        print(func_name_template)
-
-    print()
-
-    for i, addr in enumerate(addresses):
-        if pie:
-            bp_template = "LogBreakpoint.create_pie_bp"
-        else:
-            bp_template = "LogBreakpoint.create_pt_bp"
-
-        print(f"{bp_template}({hex(addr)}, {get_func_name(i)})")
-
 
 
 gdb.events.exited.connect(exit_handler)

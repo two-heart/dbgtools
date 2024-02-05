@@ -1,7 +1,8 @@
 import gdb
 from dbgtools import set_manual_breakpoint, set_manual_watchpoint, \
-                     is_program_running, gdb_continue, gdb_run, \
+                     gdb_continue, gdb_run, \
                      delete_all_breakpoints, si
+from dbgtools.utils import is_program_running
 from dbgtools.regs import *
 import time
 from dbgtools.logger import Logger
