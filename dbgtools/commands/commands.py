@@ -11,6 +11,11 @@ from dbgtools.commands.breaknew import BreakNewCmd
 from dbgtools.commands.breakpie import BreakPIECmd
 from dbgtools.commands.mmap import MmapCmd
 from dbgtools.commands.mprotect import MprotectCmd
+from dbgtools.commands.getoffsets import GetOffsetsCmd
+from dbgtools.commands.gadgetsearch import GadgetSearchCmd
+from dbgtools.commands.asanok import ASANOKCmd
+from dbgtools.commands.asanviz import ASANVisualizeCmd
+from dbgtools.commands.v8heap import V8HeapCmd
 
 
 
@@ -27,3 +32,8 @@ BreakNewCmd()
 BreakPIECmd()
 MmapCmd()
 MprotectCmd()
+GetOffsetsCmd()
+GadgetSearchCmd()
+ASANOKCmd()
+ASANVisualizeCmd()
+V8HeapCmd()
