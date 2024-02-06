@@ -99,7 +99,7 @@ class LogBreakpoint(CustomBreakpoint):
         self._logger_func = logger_func
 
     def stop(self):
-        logger = Logger.get_instance()
+        logger = Logger()
         log = self._logger_func()
         if len(log) != 0:
             logger.log_line(log)

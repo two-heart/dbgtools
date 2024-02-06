@@ -6,5 +6,6 @@ pyvenv.cfg
 examples/gdb_script.log
 examples/trace_example.py
 **/.gdb_history
+**/gdb_script.log
 .gdb_history
 **/__pycache__

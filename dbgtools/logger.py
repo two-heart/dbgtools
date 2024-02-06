@@ -1,10 +1,12 @@
 import time
 from typing import Union
 import os
+from dbgtools.utils import singleton
 
+
+# TODO(ju256): refactor this garbage
+@singleton
 class Logger:
-    __key = object()
-    __instance = None
     # TODO(liam) why did we choose bytes here and is this the best choice?
     content: bytes
     _log_count: int
@@ -12,10 +14,7 @@ class Logger:
     used_log: bool
     _start_time: float
 
-    def __init__(self, key: object):
-        if key != self.__key:
-            raise ValueError("Logger is a singletone. Use get_instance()"
-                             + " instead")
+    def __init__(self):
         self.content = b""
         self._log_count = 0
         self._config = {"enable_file_logging": True,
@@ -26,12 +25,6 @@ class Logger:
         self.used_log = False
         self.clear_log_file()
         self._start_time = time.time()
-
-    @classmethod
-    def get_instance(cls) -> "Logger":
-        if cls.__instance is None:
-            cls.__instance = Logger(cls.__key)
-        return cls.__instance
 
     def clear_log_file(self) -> None:
         if (self._config["enable_file_logging"]
@@ -63,13 +56,18 @@ class Logger:
         if self._config["file_logging_mode"] == "append":
             with open(self._config["log_file"], "ab") as f:
                 f.write(self.content)
-            self.content = b""
         else:
             with open(self._config["log_file"], "wb") as f:
                 f.write(self.content)
 
     def print_log(self) -> None:
-        print(self.content)
+        if self._config["file_logging_mode"] == "append":
+            # we need to read the log file here since content
+            # was cleared after the last append to file
+            with open(self._config["log_file"], "rb") as f:
+                print(f.read())
+        else:
+            print(self.content)
 
     def log_line(self, message: bytes) -> None:
         self.log(message + b"\n")

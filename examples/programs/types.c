@@ -39,7 +39,7 @@ int main() {
 
     memcpy(test.data, buf, 0x10);
 
-    puts(&test);
+    printf("test @ %p\n", &test);
 
     puts(test.data);
     printf("%lf\n", test.flt);

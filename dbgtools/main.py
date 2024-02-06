@@ -99,7 +99,7 @@ def wrap_readelf_s(libc_path, sym_name):
 
 
 def exit_handler(event):
-    logger = Logger.get_instance()
+    logger = Logger()
     if logger.used_log:
         logger.write_log_to_log_file()
         logger.print_log()

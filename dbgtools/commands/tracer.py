@@ -45,7 +45,7 @@ class Tracer:
                 gdb_run(self._start_args)
 
         # wait for breakpoint or watchpoint hit
-        logger = Logger.get_instance()
+        logger = Logger()
         logger.clear_log_file()
         while True:
             try:

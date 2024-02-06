@@ -25,7 +25,7 @@ class Test(Struct):
 
 
 def parse_struct():
-    t = Test(registers.rdi)
+    t = Test(registers.rsi)
     print(t)
 
     assert t.data.data == b'AAAAAAABBBBBBBB\x00'
@@ -48,7 +48,7 @@ def parse_struct():
 
 
 
-dbgtools.CustomBreakpoint('*(main+154)', explicit_stop=True)
+dbgtools.CustomBreakpoint('*(main+169)', explicit_stop=True)
 dbgtools.gdb_run()
 
 
