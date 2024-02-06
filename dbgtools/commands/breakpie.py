@@ -2,8 +2,8 @@ import gdb
 import pwndbg
 import argparse
 import pwndbg.commands
-from dbgtools.main import force_load_pie_base, get_pie_base, \
-                          set_manual_breakpoint
+from dbgtools.main import force_load_pie_base, get_pie_base
+from dbgtools.gdbapi import set_breakpoint
 from dbgtools.commands.utils import parse_tint
 
 
@@ -27,4 +27,4 @@ def bpie(offset: int):
         else:
             return
 
-    set_manual_breakpoint(piebase + offset)
+    set_breakpoint(piebase + offset)

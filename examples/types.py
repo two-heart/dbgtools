@@ -49,7 +49,7 @@ def parse_struct():
 
 
 dbgtools.CustomBreakpoint('*(main+169)', explicit_stop=True)
-dbgtools.gdb_run()
+dbgtools.gdbapi.run()
 
 
 parse_struct()

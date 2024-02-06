@@ -23,24 +23,6 @@ def is_program_running():
         return False
 
 
-def set_manual_breakpoint(addr):
-    gdb.execute(f"b *{hex(addr)}")
-
-def set_manual_watchpoint(addr):
-    gdb.execute(f"watch *{hex(addr)}")
-
-def delete_all_breakpoints():
-    gdb.execute("del")
-
-del_bps = delete_all_breakpoints
-
-
-def gdb_run(args=None):
-    if args is not None:
-        gdb.execute(f"r {' '.join(args)}")
-    else:
-        gdb.execute("r")
-
 def patch_string_gdb(addr, string):
     cmd = f"set "+" {char["+str(len(string)+1)+"]}"+ f'{hex(addr)} = "{string}"'
     gdb.execute(cmd)
@@ -167,15 +149,6 @@ def get_first_heap_end_address():
 def get_first_heap_address():
     heap_addresses = get_heap_base()
     return heap_addresses[0]
-
-def si():
-    gdb.execute("si")
-
-def gdb_continue():
-    gdb.execute("c")
-
-c = gdb_continue
-r = gdb_run
 
 def set_library_path(path):
     gdb.execute(f"set env LD_LIBRARY_PATH {path}")

@@ -1,8 +1,8 @@
 import gdb
 import time
-from dbgtools import set_manual_breakpoint, set_manual_watchpoint, \
-                     gdb_continue, gdb_run, is_program_running, \
-                     delete_all_breakpoints, si
+from dbgtools import is_program_running
+from dbgtools.gdbapi import run, cont, set_breakpoint, set_watchpoint,\
+    delete_all_breakpoints, si
 from dbgtools.regs import *
 from dbgtools.logger import Logger
 from dbgtools.commands.utils import parse_tint
@@ -31,18 +31,18 @@ class Tracer:
 
     def start(self):
         if self._start_bp_addr is not None:
-            set_manual_breakpoint(self._start_bp_addr)
+            set_breakpoint(self._start_bp_addr)
         elif self._start_wp_addr is not None:
-            set_manual_watchpoint(self._start_wp_addr)
+            set_watchpoint(self._start_wp_addr)
 
         self._start_time = time.time()
         if self._force_rerun:
-            gdb_run(self._start_args)
+            run(self._start_args)
         else:
             if is_program_running():
-                gdb_continue()
+                cont()
             else:
-                gdb_run(self._start_args)
+                run(self._start_args)
 
         # wait for breakpoint or watchpoint hit
         logger = Logger()
@@ -63,6 +63,8 @@ class Tracer:
                 if self._trace_end_addr is not None and registers.rip == self._trace_end_addr:
                     break
                 si()
+                # TODO(ju256): use this again if possible
+                # dont remember when this broke
                 # execute_commands("s")
             except gdb.error:
                 break

@@ -1,16 +1,16 @@
 from dbgtools.logger import Logger
 from dbgtools.gdbapi import execute_commands
-from dbgtools.main import gdb_run, gdb_continue
+from dbgtools.gdbapi import run, cont
 import re
 
 logger = Logger()
 execute_commands(["tb *main", "tb *main+92"])
 
-gdb_run()
+run()
 
 execute_commands(["traceheap on"])
 
-gdb_continue()
+cont()
 
 execute_commands(["traceheap off"])
 

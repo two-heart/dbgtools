@@ -9,4 +9,4 @@ def log() -> bytes:
 dbgtools.LogBreakpoint('*(main+12)', log)
 logger = Logger()
 logger.print_log()
-dbgtools.gdb_run()
+dbgtools.gdbapi.run()
