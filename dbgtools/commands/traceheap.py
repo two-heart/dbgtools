@@ -5,7 +5,7 @@ import pwndbg
 import argparse
 import pwndbg.commands
 from dbgtools.breakpoints import LogBreakpoint
-from dbgtools.main import get_malloc_addr, get_free_addr
+from dbgtools.functions import get_malloc_addr, get_free_addr
 from dbgtools.regs import *
 from dbgtools.memory import read_stack
 from dbgtools.logger import Logger
@@ -96,4 +96,4 @@ def traceheap(state: Optional[str] = None):
     else:
         heap_trace_log = list(filter(lambda l: l.startswith(b"[TraceHeap] "), Logger().content.splitlines()))
         for l in heap_trace_log:
-            print(l.replace(b"[TraceHeap] ", b""))
+            print(l.replace(b"[TraceHeap] ", b"").decode())

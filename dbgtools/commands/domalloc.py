@@ -2,12 +2,12 @@ import gdb
 import argparse
 import pwndbg
 import pwndbg.commands
-from dbgtools.commands.utils import SupressedOutput, parse_tint
-from dbgtools.main import get_malloc_addr, call_func1
+from dbgtools.commands.utils import SupressedOutput
+from dbgtools.functions import get_malloc_addr, call_func1
+
 
 parser = argparse.ArgumentParser(description="Performs malloc(size)")
 parser.add_argument("size", type=int, help="size")
-
 
 @pwndbg.gdblib.proc.OnlyWhenRunning
 @pwndbg.commands.ArgparsedCommand(parser)

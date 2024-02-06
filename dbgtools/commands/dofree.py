@@ -3,7 +3,7 @@ import argparse
 import pwndbg
 import pwndbg.commands
 from dbgtools.commands.utils import SupressedOutput, parse_tint
-from dbgtools.main import *
+from dbgtools.functions import get_free_addr, call_func1
 
 
 parser = argparse.ArgumentParser(description="Performs free(ptr)")
