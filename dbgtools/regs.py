@@ -1,6 +1,6 @@
-import gdb
 import ctypes
 from dataclasses import dataclass
+from dbgtools.gdbapi import execute_command, parse_and_eval
 
 
 def is_bit_set(val, bit):
@@ -8,10 +8,10 @@ def is_bit_set(val, bit):
 
 
 def read_reg_ctype_convert(reg_name, conv_func):
-    return conv_func(gdb.parse_and_eval(f"${reg_name}")).value
+    return conv_func(parse_and_eval(f"${reg_name}")).value
 
 def set_reg(reg_name, val):
-    gdb.execute(f"set ${reg_name} = {hex(val)}", to_string=True)
+    execute_command(f"set ${reg_name} = {hex(val)}")
 
 
 def read_reg8(reg_name):

@@ -22,6 +22,7 @@ class SupressedOutput():
         reenable_output()
 
 
+# TODO(ju256): remove when everything is argparsed
 def parse_tint(s):
     try:
         return int(s, 0)

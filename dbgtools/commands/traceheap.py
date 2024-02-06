@@ -1,6 +1,5 @@
 from enum import Enum
 from typing import Optional
-import gdb
 import pwndbg
 import argparse
 import pwndbg.commands

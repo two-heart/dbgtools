@@ -1,4 +1,3 @@
-import gdb
 import pwndbg
 import argparse
 import pwndbg.commands

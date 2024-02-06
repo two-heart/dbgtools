@@ -4,6 +4,7 @@ from dbgtools.main import get_pie_base
 from dbgtools.logger import Logger
 
 
+# TODO(ju256): move to gdb api
 def get_all_breakpoints() -> Sequence[gdb.Breakpoint]:
     return gdb.breakpoints()
 
