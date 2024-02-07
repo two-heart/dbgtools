@@ -9,6 +9,7 @@ import dbgtools.commands.v8heap
 import dbgtools.commands.gadgetsearch
 import dbgtools.commands.libcbase
 import dbgtools.commands.traceheap
+import dbgtools.commands.tracer
 
 # TODO(ju256): port the rest of those commands to argparsed commands
 from dbgtools.commands.libcsym import LibcSymCmd
@@ -16,11 +17,9 @@ from dbgtools.commands.pwndump import PwnDumpCmd
 from dbgtools.commands.getoffsets import GetOffsetsCmd
 
 from dbgtools.commands.heaplookup import HeapPtrLookup
-from dbgtools.commands.tracer import TracerCmd
 
 
 LibcSymCmd()
 PwnDumpCmd()
 HeapPtrLookup()
-TracerCmd()
 GetOffsetsCmd()

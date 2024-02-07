@@ -1,13 +1,17 @@
 import gdb
 import time
+import pwndbg
+import argparse
+import pwndbg.commands
 from dbgtools import is_program_running
 from dbgtools.gdbapi import run, cont, set_breakpoint, set_watchpoint,\
     delete_all_breakpoints, si, execute_command
 from dbgtools.regs import *
 from dbgtools.logger import Logger
-from dbgtools.commands.utils import parse_tint
+from typing import Optional
 
 
+# TODO(ju256): pretty bad refactor
 class Tracer:
     def __init__(self, trace_end_addr=None, start_bp_addr=None, start_wp_addr=None, force_rerun=True, start_args=None, timeout=60):
         self._trace_end_addr = trace_end_addr
@@ -39,6 +43,9 @@ class Tracer:
         if self._force_rerun:
             run(self._start_args)
         else:
+            print("jo")
+            print(registers.rdi)
+            print(is_program_running())
             if is_program_running():
                 cont()
             else:
@@ -67,37 +74,31 @@ class Tracer:
                 # dont remember when this broke
                 # execute_command("s")
             except gdb.error:
+                # TODO(ju256): shit way to stop here. refactor
                 break
 
         logger.print_log()
         logger.write_log_to_log_file()
 
 
-class TracerCmd(gdb.Command):
-    """Traces instructions"""
-    def __init__(self):
-        super(TracerCmd, self).__init__("tracer", gdb.COMMAND_USER)
+parser = argparse.ArgumentParser(description="Traces instructions")
+parser.add_argument("--watchpoint", action='store_true', help="start tracing from a watchpoint")
+parser.add_argument("--breakpoint", action='store_true', help="start tracing from a breakpoint")
+parser.add_argument("ptr", type=int, help="watch/breakpoint string")
+parser.add_argument("--end", type=int, help="stop tracing when this address is hit")
+parser.add_argument("--force-rerun", action='store_true', help="force a rerun the program")
 
-    def help(self):
-        print("Usage: tracer w|b <watchpoint/breakpoint address> <trace end address>")
 
-    def invoke(self, argument, from_tty):
-        argument = argument.split()
-        if len(argument) < 2:
-            self.help()
+
+@pwndbg.gdblib.proc.OnlyWhenRunning
+@pwndbg.commands.ArgparsedCommand(parser)
+def tracer(watchpoint: bool, breakpoint: bool, ptr: int, end: Optional[int] = None, force_rerun: bool = False):
+    if (not watchpoint and not breakpoint) or (watchpoint and breakpoint):
+        raise ValueError("Either --watchpoint or --breakpoint need to be specified")
+    else:
+        delete_all_breakpoints()
+        if watchpoint:
+            t = Tracer.get_from_watchpoint(ptr, trace_end_addr=end, force_rerun=force_rerun)
         else:
-            mode = argument[0]
-            if mode != "w" and mode != "b":
-                self.help()
-            else:
-                paddr = parse_tint(argument[1])
-                if len(argument) == 3:
-                    trace_end_addr = parse_tint(argument[2])
-                else:
-                    trace_end_addr = None
-                delete_all_breakpoints()
-                if mode == "w":
-                    t = Tracer.get_from_watchpoint(paddr, trace_end_addr=trace_end_addr)
-                else:
-                    t = Tracer.get_from_breakpoint(paddr, trace_end_addr=trace_end_addr)
-                t.start()
+            t = Tracer.get_from_breakpoint(ptr, trace_end_addr=end, force_rerun=force_rerun)
+        t.start()

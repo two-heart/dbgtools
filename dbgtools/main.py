@@ -17,7 +17,7 @@ from dbgtools.memory import write_pointer
 def is_program_running():
     # very hacky
     try:
-        gdb.execute("x $ax", to_string=True)
+        registers.ax
         return True
     except gdb.error:
         return False
