@@ -88,6 +88,7 @@ def get_main_arena_off(libc_path):
     main_arena_off = (__malloc_hook_off - __realloc_hook_off) * 2 + __malloc_hook_off
     return main_arena_off
 
+# FIXME(ju256): fully bricked
 def wrap_get_got_addr(symbol_name):
     jmpslots = list(pwndbg.wrappers.readelf.get_jmpslots())
     for line in jmpslots:

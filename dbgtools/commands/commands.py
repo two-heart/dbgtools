@@ -12,12 +12,4 @@ import dbgtools.commands.traceheap
 import dbgtools.commands.tracer
 import dbgtools.commands.heaplookup
 import dbgtools.commands.pwndump
-
-
-# TODO(ju256): port the rest of those commands to argparsed commands
-from dbgtools.commands.getoffsets import GetOffsetsCmd
-
-
-
-LibcSymCmd()
-GetOffsetsCmd()
+import dbgtools.commands.getoffsets
