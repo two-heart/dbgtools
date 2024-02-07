@@ -65,6 +65,7 @@ def get_libc_bin_sh(libc_path):
     return int(data.split(b"/bin/sh")[0].strip(), 16)
 
 
+# TODO(ju256): just using current libc in case of failure is confusing. fix
 def get_main_arena_off(libc_path):
     # https://github.com/bash-c/main_arena_offset/blob/master/main_arena
     try:
