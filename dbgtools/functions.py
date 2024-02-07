@@ -1,5 +1,6 @@
 from dbgtools.regs import *
 from dbgtools.gdbapi import execute_commands
+from dbgtools.main import get_function_symbol_addr
 
 
 PROT_READ = 0x1
@@ -81,3 +82,11 @@ def mmap(address=0, size=0x1000, protect=PROT_READ|PROT_WRITE|PROT_EXEC,
          flags=MAP_PRIVATE|MAP_ANON, filedes=0, offset=0):
     mmap_func_ptr = get_mmap_addr()
     return call_func6(mmap_func_ptr, address, size, protect, flags, filedes, offset)
+
+def malloc(size: int):
+    malloc_func_ptr = get_malloc_addr()
+    return call_func1(malloc_func_ptr, size)
+
+def free(ptr: int):
+    free_func_ptr = get_free_addr()
+    return call_func1(free_func_ptr, ptr)
