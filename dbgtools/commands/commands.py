@@ -15,7 +15,6 @@ import dbgtools.commands.pwndump
 
 
 # TODO(ju256): port the rest of those commands to argparsed commands
-from dbgtools.commands.libcsym import LibcSymCmd
 from dbgtools.commands.getoffsets import GetOffsetsCmd
 
 
