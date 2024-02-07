@@ -1,5 +1,5 @@
 from dbgtools.regs import *
-from dbgtools.gdbapi import execute_commands
+from dbgtools.gdbapi import execute_command
 from dbgtools.main import get_function_symbol_addr
 
 
@@ -26,10 +26,10 @@ def get_mprotect_addr():
 
 def sim_call(ret_address: int):
     registers.rsp -= 8
-    execute_commands(["set {long*}$rsp="+f"{hex(ret_address)}"])
+    execute_command("set {long*}$rsp="+f"{hex(ret_address)}")
 
 def finish_func():
-    execute_commands(["finish"])
+    execute_command("finish")
 
 def call_function(func_ptr, rdi=None, rsi=None, rdx=None, rcx=None, r8=None, r9=None):
     reg_state = registers.dump()

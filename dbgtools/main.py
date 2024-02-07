@@ -9,7 +9,7 @@ from typing import Optional, Sequence
 from dataclasses import dataclass
 from subprocess import check_output
 from dbgtools.logger import Logger
-from dbgtools.gdbapi import execute_commands
+from dbgtools.gdbapi import execute_command
 from dbgtools.regs import *
 from dbgtools.memory import write_pointer
 
@@ -174,7 +174,7 @@ def get_pie_base() -> Optional[int]:
     return get_binary_base()
 
 def force_load_pie_base() -> Optional[int]:
-    execute_commands(["entry"])
+    execute_command("entry")
     return get_pie_base()
 
 def get_current_libc_path() -> Optional[str]:

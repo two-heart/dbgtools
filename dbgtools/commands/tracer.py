@@ -2,7 +2,7 @@ import gdb
 import time
 from dbgtools import is_program_running
 from dbgtools.gdbapi import run, cont, set_breakpoint, set_watchpoint,\
-    delete_all_breakpoints, si
+    delete_all_breakpoints, si, execute_command
 from dbgtools.regs import *
 from dbgtools.logger import Logger
 from dbgtools.commands.utils import parse_tint
@@ -65,7 +65,7 @@ class Tracer:
                 si()
                 # TODO(ju256): use this again if possible
                 # dont remember when this broke
-                # execute_commands("s")
+                # execute_command("s")
             except gdb.error:
                 break
 
