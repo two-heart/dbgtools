@@ -35,6 +35,7 @@ def ptr_to_symbol(ptr):
     return pwndbg.gdblib.symbol.get(ptr)
 
 
+# FIXME(ju256): do better here
 def wrap_readelf_s(libc_path, sym_name):
     data = check_output(f"readelf -s {libc_path}", shell=True).splitlines()
     data = list(filter(lambda l: sym_name in l.decode(), data))
@@ -100,11 +101,10 @@ def wrap_get_got_addr(symbol_name):
     return -1
 
 def wrap_get_plt_addr(symbol_name):
+    # FIXME: implement
     raise NotImplementedError("parsing .plt(.sec) seems to be to hard for tools???? to lazy to implement the parsing myself now")
 
 def resolve_symbol_address(symbol_name, libc_path=None):
-    # we might want to be able to also retrieve library .got/.plt addresses
-    # however as this is a very unlikely case we ignore it for now :)
     is_binary_sym = symbol_name.endswith("@got") or symbol_name.endswith("@plt")
     if is_binary_sym:
         if symbol_name.endswith("@got"):
@@ -183,31 +183,6 @@ def get_current_libc_path() -> Optional[str]:
     for page in pwndbg.gdblib.vmmap.get():
         if "libc" in page.objfile:
             return page.objfile
-
-# very slow and very shit but who gives a fuck about perf anyways :)
-def search_libc_in_dir(start_dir="."):
-    results = []
-    for root, dirs, files in os.walk(start_dir):
-        for f in files:
-            if f.endswith("libc.so.6"):
-                results.append(root + "/" + f)
-    return results
-
-def search_libc64_in_dir(start_dir="."):
-    all_libcs = search_libc_in_dir(start_dir)
-    return list(filter(lambda lc: "64" in lc, all_libcs))
-
-# 32bit generelly not supported anyways yet
-def search_libc32_in_dir(start_dir="."):
-    all_libcs = search_libc_in_dir(start_dir)
-    return [lc for lc in all_libcs if lc not in search_libc64_in_dir(start_dir)]
-
-def get_system_libc_path():
-    results = search_libc64_in_dir("/lib")
-    if len(results) >= 1:
-        return results[0]
-    else:
-        return ""
 
 
 gdb.events.exited.connect(exit_handler)
