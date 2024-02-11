@@ -10,3 +10,5 @@ from dbgtools import memory
 from dbgtools import regs
 from dbgtools import functions
 from dbgtools import utils
+from dbgtools import bits
+from dbgtools import tls

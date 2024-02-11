@@ -13,3 +13,4 @@ import dbgtools.commands.tracer
 import dbgtools.commands.heaplookup
 import dbgtools.commands.pwndump
 import dbgtools.commands.getoffsets
+import dbgtools.commands.tlsptrmangle
