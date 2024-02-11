@@ -808,7 +808,7 @@ class StructMeta(type):
             cur_position += field.size()
           else:
             assert field.offset() >= cur_position
-            cur_position = field.offset()
+            cur_position = field.offset() + field.size()
           if field_name.startswith("_"):
             field.set_skip_print()
 
