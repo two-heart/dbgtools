@@ -37,7 +37,7 @@ def parse_struct():
     assert a.x == 0x1337
     assert a.y == 0x420
 
-    t.func_ptr(0x13, 0x37) == 0x13 * 0x37
+    assert t.func_ptr(0x13, 0x37) == 0x13 * 0x37
 
     t.data.data = b"XXXXYYYY\x00"
     t.flt = 1337.1337

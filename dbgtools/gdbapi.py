@@ -4,7 +4,6 @@ import gdb
 
 def execute_commands(cmds: list[str]):
     for cmd in cmds:
-        print(cmd)
         gdb.execute(cmd, to_string=True)
 
 def execute_command(cmd: str):

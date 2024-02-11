@@ -10,16 +10,16 @@ BLUE = "\x1b[34m"
 ASAN_REGION_RANGE = 0x50
 
 
-def asan_ok(ptr):
+def access_ok(ptr):
   return read_byte((ptr >> 3) + 0x7fff8000) == 0
 
-def asan_visualize_region(optr):
+def visualize_region(optr):
   def pad_mem(ptr):
     return "0x" + (hex(read_u64(p1))[2:]).rjust(16, "0")
 
   def pad_color_asan(ptr):
     v = pad_mem(ptr)
-    color = GREEN if asan_ok(ptr) else RED
+    color = GREEN if access_ok(ptr) else RED
     return color+v
 
   for ptr in range(optr - ASAN_REGION_RANGE, optr + ASAN_REGION_RANGE, 16):
