@@ -33,3 +33,6 @@ def si():
 
 def parse_and_eval(s: str):
     return gdb.parse_and_eval(s)
+
+def finish():
+    execute_command("finish")

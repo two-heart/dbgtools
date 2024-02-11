@@ -5,7 +5,7 @@
 from dbgtools.memory import read_u8, read_u16, read_bool, read_s32, read_s64, read_u32, read_u64, read_double, read_float, read_string, read_pointer,\
   write_u8, write_u16, write_bool, write_s32, write_s64, write_u32, write_u64, write_double, write_float, write_string, write_pointer
 from dbgtools.main import ptr_to_symbol
-from dbgtools.functions import call_function
+from dbgtools.functions import SystemVAMD64
 
 from abc import ABC, abstractmethod
 from typing import Optional, Union
@@ -634,7 +634,8 @@ class ICallable:
     if len(args) > 6:
       raise ValueError("Only supporting registers call arguments for now")
 
-    return call_function(self._func_ptr, *args)
+    # TODO(ju256): support more calling conventions
+    return SystemVAMD64(*args).call(self._func_ptr)
 
 
 class CallableFieldType(FieldType):

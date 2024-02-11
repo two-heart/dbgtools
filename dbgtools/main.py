@@ -11,7 +11,7 @@ from subprocess import check_output
 from dbgtools.logger import Logger
 from dbgtools.gdbapi import execute_command
 from dbgtools.regs import *
-from dbgtools.memory import write_pointer
+from dbgtools.memory import write_pointer, read_bytes
 
 
 def is_program_running():
@@ -183,6 +183,17 @@ def get_current_libc_path() -> Optional[str]:
     for page in pwndbg.gdblib.vmmap.get():
         if "libc" in page.objfile:
             return page.objfile
+
+
+def find_gadget(gadget_bytes: bytes):
+    for page in sorted(get_executable_pages(), key=lambda p: p.start):
+        if not page.read:
+            # vsyscall
+            continue
+        for ptr in range(page.start, page.end + 1 - 8):
+            if read_bytes(ptr, len(gadget_bytes)) == gadget_bytes:
+                offset = ptr - page.start
+                yield (page, offset)
 
 
 gdb.events.exited.connect(exit_handler)
