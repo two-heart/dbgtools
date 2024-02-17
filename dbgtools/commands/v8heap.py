@@ -13,19 +13,19 @@ parser.add_argument("--offset", type=int, help="Offset from v8 heap")
 
 @pwndbg.gdblib.proc.OnlyWhenRunning
 @pwndbg.commands.ArgparsedCommand(parser)
-def v8_heap(ptr: Optional[int] = None, offset: Optional[int] = None):
-        v8_heap_page_obj = v8heap_page()
-        v8_heap_addr = v8heap_start_addr()
-        if v8_heap_addr == -1:
-            print("V8 heap not found")
-            return
+def v8heap(ptr: Optional[int] = None, offset: Optional[int] = None):
+    v8_heap_page_obj = v8heap_page()
+    v8_heap_addr = v8heap_start_addr()
+    if v8_heap_addr == -1:
+        print("V8 heap not found")
+        return
+    else:
+        if ptr is None and offset is None:
+            print(f"V8 heap @ {hex(v8_heap_addr)}")
+        elif offset is not None:
+            print(f"V8 heap+{hex(offset)} @ {hex(v8_heap_addr+offset)}")
         else:
-            if ptr is None and offset is None:
-                print(f"V8 heap @ {hex(v8_heap_addr)}")
-            elif offset is not None:
-                print(f"V8 heap+{hex(offset)} @ {hex(v8_heap_addr+offset)}")
+            if ptr >= v8_heap_page_obj.end:
+                print("ptr does not seem to be on V8 heap")
             else:
-                if ptr >= v8_heap_page_obj.end:
-                    print("ptr does not seem to be on V8 heap")
-                else:
-                    print(f"V8 heap offset @ {hex(ptr - v8_heap_addr)}")
+                print(f"V8 heap offset @ {hex(ptr - v8_heap_addr)}")
